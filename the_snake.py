@@ -1,5 +1,6 @@
 """Игра Змейка."""
 from random import randint
+
 import pygame
 
 
@@ -31,7 +32,7 @@ SNAKE_COLOR = (0, 255, 0)
 SPEED = 7
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
-pygame.display.set_caption("Змейка")
+pygame.display.set_caption('Змейка')
 clock = pygame.time.Clock()
 
 
@@ -147,8 +148,7 @@ class Snake(GameObject):
 
     def reset(self):
         """Метод возвращающий змейку в игру."""
-        snake = Snake()
-        return snake
+        return Snake()
 
 
 def main():
@@ -182,5 +182,5 @@ def main():
         pygame.display.update()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
