@@ -2,6 +2,7 @@
 
 from random import randint
 from typing import Tuple
+
 import pygame as pg
 
 # Алиасы для аннотации
@@ -42,7 +43,7 @@ pg.display.set_caption('Змейка')
 clock = pg.time.Clock()
 
 
-def handle_keys(snake: Snake) -> None:
+def handle_keys(snake: 'Snake') -> None:
     """Обрабатывает все игровые события."""
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -73,7 +74,7 @@ class GameObject:
     def draw(self) -> None:
         """Метод отрисовки объекта."""
         raise NotImplementedError(
-            "Метод draw() должен быть переопределён в дочернем классе"
+            'Метод draw() должен быть переопределён в дочернем классе'
         )
 
 
