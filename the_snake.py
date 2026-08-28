@@ -10,12 +10,13 @@ Pointer = Tuple[int, int]
 Color = Tuple[int, int, int]
 
 
-# Константы для размеров поля и сетки:
+# Константы для поля, сетки, стартовой точки яблока:
 SCREEN_WIDTH: int = 640
 SCREEN_HEIGHT: int = 480
 GRID_SIZE: int = 20
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
+DEFAULT_POSITION = (0, 0)
 
 # Направления движения:
 UP: Pointer = (0, -GRID_SIZE)
@@ -83,16 +84,23 @@ class Apple(GameObject):
 
     def __init__(
             self, body_color: Color = APPLE_COLOR,
-            position: Pointer = (240, 200)
-    ):
+            occupied_positions: list[Pointer] | None = None
+    ) -> None:
         """Инициализирует яблоко."""
-        super().__init__(body_color, position)
+        super().__init__(body_color, DEFAULT_POSITION)
+        if occupied_positions is None:
+            occupied_positions = []
+        self.randomize_position(occupied_positions)
 
-    def randomize_position(self) -> None:
+    def randomize_position(self, occupied_positions: list[Pointer]) -> None:
         """Метод отвечает за случайную позицию яблока."""
-        self.x = randint(0, GRID_WIDTH - 1) * GRID_SIZE
-        self.y = randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-        self.position = (self.x, self.y)
+        while True:
+            x = randint(0, GRID_WIDTH - 1) * GRID_SIZE
+            y = randint(0, GRID_HEIGHT - 1) * GRID_SIZE
+            new_position = (x, y)
+            if new_position not in occupied_positions:
+                self.position = new_position
+                break
 
     def draw(self) -> None:
         """Отрисовка яблока."""
@@ -104,11 +112,17 @@ class Apple(GameObject):
 class Snake(GameObject):
     """Отвечает за движение змейки."""
 
-    def __init__(self, body_color: Color = SNAKE_COLOR) -> None:
+    def __init__(
+        self, body_color: Color = SNAKE_COLOR, position: Pointer | None = None
+    ) -> None:
         """Инициализирует змейку."""
-        start_x = randint(0, GRID_WIDTH - 1) * GRID_SIZE
-        start_y = randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-        start_position = (start_x, start_y)
+        if position is None:
+            start_x = randint(0, GRID_WIDTH - 1) * GRID_SIZE
+            start_y = randint(0, GRID_HEIGHT - 1) * GRID_SIZE
+            start_position = (start_x, start_y)
+        else:
+            start_position = position
+
         super().__init__(body_color, start_position)
         self.length = 1
         self.positions = [start_position]
@@ -171,9 +185,8 @@ class Snake(GameObject):
 def main() -> None:
     """Запускает основной игровой цикл."""
     pg.init()
-    apple = Apple()
-    apple.randomize_position()
     snake = Snake()
+    apple = Apple(occupied_positions=snake.positions)
 
     while True:
         screen.fill(BOARD_BACKGROUND_COLOR)
@@ -182,11 +195,10 @@ def main() -> None:
         snake.update_direction()
         snake.move()
         if snake.get_head_position() == apple.position:
-            apple.randomize_position()
+            apple.randomize_position(snake.positions)
             snake.length += 1
         if snake.get_head_position() in snake.positions[1:]:
-            apple = Apple()
-            apple.randomize_position()
+            apple.randomize_position(snake.positions)
             snake.reset()
         apple.draw()
         snake.draw()
